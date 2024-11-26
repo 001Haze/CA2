@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract TokenTransfer {
+    address public owner; // Contract owner's address
+    mapping(address => uint256) public balances; 
+  
+    event Transfer(address indexed from, address indexed to, uint256 amount);
+
+   
+    constructor() {
+        owner = msg.sender;
+    }
+
+ 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can perform this action");
+        _;
+    }
+
+  
+    function transferTokens(address _to, uint256 _amount) public onlyOwner {
+        require(_to != address(0), "Cannot transfer to the zero address");
+        require(balances[owner] >= _amount, "Insufficient balance");
+
+        // Perform the transfer
+        balances[owner] -= _amount;
+        balances[_to] += _amount;
+
+        // Emit the Transfer event
+        emit Transfer(owner, _to, _amount);
+    }
+
+    receive() external payable {
+        balances[msg.sender] += msg.value;
+    }
+}
